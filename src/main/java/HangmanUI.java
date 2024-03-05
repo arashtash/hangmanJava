@@ -1,3 +1,8 @@
+/**
+ * @author Arash Tashakori
+ * This class implements a Java app for the Hangman game with words chosen from two sets of word lists
+ */
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,54 +23,92 @@ public class HangmanUI extends JFrame {
     private JLabel labelForLives;
     private JTextField inputField;
     private JLabel errorMessage;
+    private String alreadyGuessedCharacters;
+    private JLabel alreadyGuessedCharactersLabel;
+    private static final String WORDS_FILE = "src/main/java/words.txt";
+    private static final String COUNTRIES_FILE = "src/main/java/countries.txt";
 
-    // Constructor to set up the GUI
-    public HangmanUI(String filename) {
-        word = getRandomWordFromFile(filename);
-        wordFoundSoFar = encodeWordWithStars(word);
-
+    // Constructor to set up the Hangman java app
+    public HangmanUI() {
         setTitle("HangmanJava");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(300, 200);
         setLocationRelativeTo(null);    //Centre the window on the screen
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        displayMenu(); // Display the menu screen
+        setVisible(true);
+    }
+
+    /*This method handles the displaying of the initial main menu which takes the user to their game of choice
+    * (Hangman with words or country names) */
+    private void displayMenu() {
+        // Create a new panel for the menu
+        JPanel menuPanel = new JPanel();
+        menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
+
+        // Create buttons to initialize word and country games based on user input
+        JButton wordButton = new JButton("Word");
+        wordButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        wordButton.addActionListener(e -> startGame(WORDS_FILE));
+        JButton countryButton = new JButton("Country");
+        countryButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        countryButton.addActionListener(e -> startGame(COUNTRIES_FILE));
+
+        // Add buttons to the menu panel
+        menuPanel.add(wordButton);
+        menuPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Add some space between the buttons
+        menuPanel.add(countryButton);
+
+        // Replace the current content panel with the menu panel
+        setContentPane(menuPanel);
+        revalidate(); // Refresh the panel to display the new panel
+    }
+
+    //This game handles the actual game panel once the theme of the word is chosen from the main menu
+    private void startGame(String filename) {
+        //Initialize/Reinitialize Game
+        word = getRandomWordFromFile(filename);
+        wordFoundSoFar = encodeWordWithStars(word);
+        lives = 7;
+        letterEnteredBefore = new boolean[26];
+
+        JPanel gamePanel = new JPanel();
+        gamePanel.setLayout(new BoxLayout(gamePanel, BoxLayout.Y_AXIS));
 
         //Adding labels to the panel for wordSoFar and Lives
         labelOfWord = new JLabel(wordFoundSoFar);
         labelOfWord.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(labelOfWord);
+        gamePanel.add(labelOfWord);
         labelForLives = new JLabel("Lives: " + lives);
         labelForLives.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(labelForLives);
+        gamePanel.add(labelForLives);
 
         //Adding the field for inputs
         inputField = new JTextField();
         inputField.setMaximumSize(new Dimension(100, 30));
         inputField.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(inputField);
+        gamePanel.add(inputField);
 
-        //Adding the error message to notify user of wrong input
+        // Adding the error message to notify user of wrong input
         errorMessage = new JLabel("");
         errorMessage.setForeground(Color.RED);
         errorMessage.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(errorMessage);
+        gamePanel.add(errorMessage);
 
-        //Adding submit button to the panel
-        JButton submitButton = new JButton ("Submit");
-        submitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        //Handling submitting action: calls handleGuess upon submitting
-        submitButton.addActionListener (new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                handleGuess ();
-            }
-        });
-        panel.add(submitButton);
+        //Adding the String representing the characters already guessed to the panel
+        alreadyGuessedCharactersLabel = new JLabel("Guessed Letters: ");
+        alreadyGuessedCharactersLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        gamePanel.add(alreadyGuessedCharactersLabel);
 
-        add(panel);
-        setVisible(true);
+        //Adding guess button to the panel, when pressed handleGuess is called
+        JButton guessButton = new JButton("Guess");
+        guessButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        guessButton.addActionListener(e -> handleGuess());
+        gamePanel.add(guessButton);
+
+        //Refreshing the game panel
+        setContentPane(gamePanel);
+        revalidate();
     }
 
     // Method to handle the guessing and guess checking logic for the game
@@ -95,6 +138,8 @@ public class HangmanUI extends JFrame {
                 lives--;
             }
             letterEnteredBefore[indexOfNext] = true;
+            alreadyGuessedCharacters += currLetter + " ";
+            alreadyGuessedCharactersLabel.setText("Guessed Letters: " + alreadyGuessedCharacters);
         }
 
         updateUI();
@@ -111,6 +156,15 @@ public class HangmanUI extends JFrame {
         labelOfWord.setText(wordFoundSoFar);
         labelForLives.setText("Lives: " + lives);
         inputField.setText("");
+        //Assembling the already entered letters string
+        String guessedLetters = "";
+        for (int i = 0; i < letterEnteredBefore.length; i++) {
+            if (letterEnteredBefore[i]) {
+                guessedLetters += (char) ('a' + i) + " ";
+            }
+        }
+
+        alreadyGuessedCharactersLabel.setText("Guessed Letters: " + guessedLetters);
     }
 
     // Method to end the game and show a message
@@ -153,11 +207,6 @@ public class HangmanUI extends JFrame {
 
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new HangmanUI("src/main/java/words.txt");
-            }
-        });
+        SwingUtilities.invokeLater(() -> new HangmanUI());
     }
 }

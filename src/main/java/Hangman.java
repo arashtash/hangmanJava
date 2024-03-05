@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 public class Hangman {
+
     public static void main (String [] args){
         int lives = 7;
         final String filePath = "src/main/java/words.txt";
@@ -158,6 +159,7 @@ public class Hangman {
             System.out.println("Game over: The word was " + word);
         }
     }
+
 }
 
 
