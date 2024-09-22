@@ -38,6 +38,12 @@ The game is case-insensitive; it does not matter whether you enter uppercase or 
 
 Enjoy the game!
 
+# Author
+Arash Tashakori
+
+
+[Website and Contact information](https://arashtash.github.io/)
+
 # MIT License
 
 Copyright (c) 2024 arashtash - Arash Tashakori
@@ -60,8 +66,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-# Author
-Arash Tashakori
+
 
 
 
